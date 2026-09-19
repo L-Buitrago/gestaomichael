@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão Comercial — Estoque & Vendas</title>
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('mano_app_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect rx=%2220%22 width=%22100%22 height=%22100%22 fill=%22%233b82f6%22/><text y=%22.72em%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2260%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22700%22>G</text></svg>">
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebarEl">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">Gestão Comercial</div>
+          <div class="brand-sub">Estoque & Vendas 2026</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+
+        <button type="button" class="nav-item active" data-tab="tab-dashboard" id="tabBtnDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="nav-label">Dashboard</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="tab-estoque" id="tabBtnEstoque">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          <span class="nav-label">Estoque</span>
+          <span class="nav-badge" id="badgeStockCount">19</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="tab-vendas" id="tabBtnVendas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span class="nav-label">Vendas</span>
+          <span class="nav-badge" id="badgeSalesCount">49</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="tab-fiado" id="tabBtnFiado">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          <span class="nav-label">Contas a Receber</span>
+          <span class="nav-badge" id="badgeFiadoCount">13</span>
+        </button>
+
+        <div class="nav-section-label">Análise</div>
+
+        <button type="button" class="nav-item" data-tab="tab-anual" id="tabBtnAnual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+          <span class="nav-label">Visão Anual</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="tab-calc" id="tabBtnCalc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><line x1="16" x2="16" y1="10" y2="10"/><line x1="12" x2="12" y1="10" y2="10"/><line x1="8" x2="8" y1="10" y2="10"/><line x1="12" x2="12" y1="14" y2="14"/><line x1="8" x2="8" y1="14" y2="14"/><line x1="12" x2="12" y1="18" y2="18"/><line x1="8" x2="8" y1="18" y2="18"/></svg>
+          <span class="nav-label">Calculadora</span>
+        </button>
+
+        <div class="nav-section-label">Operacional</div>
+
+        <button type="button" class="nav-item" data-tab="tab-pedidos" id="tabBtnPedidos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="nav-label">Pedidos da Fábrica</span>
+          <span class="nav-badge" id="badgePedidosCount">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-item" id="btnSidebarThemeToggle" title="Alternar tema">
+          <svg id="sidebarThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <span class="nav-label sidebar-footer-text" id="sidebarThemeLabel">Tema Claro</span>
+        </button>
+        <button type="button" class="nav-item" id="btnBackupModal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          <span class="nav-label sidebar-footer-text">Backup / Dados</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <div class="main-content">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-sidebar-toggle" id="btnSidebarToggle" title="Recolher menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+          </button>
+          <span class="page-title" id="pageTitleText">Dashboard</span>
+        </div>
+        <div class="topbar-right">
+          <div class="save-indicator" id="saveIndicator">
+            <span class="save-dot"></span>
+            <span id="lastSavedText">Salvo</span>
+          </div>
+          <span class="clock-display" id="liveClockDisplay">00:00</span>
+
+          <button type="button" class="topbar-btn" id="btnThemeToggle" title="Mudar para Tema Claro">
+            <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <span id="themeToggleLabel">Claro</span>
+          </button>
+
+          <button type="button" class="topbar-btn" id="btnUndoAction" title="Desfazer (Ctrl+Z)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Desfazer
+          </button>
+
+          <button type="button" class="topbar-btn topbar-btn-primary" id="btnModalNovaVenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            Nova Venda
+          </button>
+
+          <div class="user-menu" id="btnUserModal" title="Alterar nome">
+            <div class="user-avatar" id="userAvatarText">M</div>
+            <span class="user-name" id="topUserName">Mano</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="content-area">
+
+        <!-- ================= TAB: DASHBOARD ================= -->
+        <main class="tab-content-panel active" id="tab-dashboard">
+          <section class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Faturamento Total</span>
+                <div class="kpi-icon kpi-icon-blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiFaturamento">R$ 0,00</div>
+              <div class="kpi-sub">Vendas acumuladas no ano</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Lucro Real</span>
+                <div class="kpi-icon kpi-icon-green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiLucroReal">R$ 0,00</div>
+              <div class="kpi-sub">Margem: <span class="highlight" id="kpiMargemMedia">0%</span></div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Contas a Receber</span>
+                <div class="kpi-icon kpi-icon-yellow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiFiadoPendente">R$ 0,00</div>
+              <div class="kpi-sub"><span class="highlight" id="kpiFiadoClientes">0</span> clientes pendentes</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Saldo em Caixa</span>
+                <div class="kpi-icon kpi-icon-blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiSaldoCaixa">R$ 0,00</div>
+              <div class="kpi-sub">Entradas líquidas menos custos</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Estoque Avaliado</span>
+                <div class="kpi-icon kpi-icon-red">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpiEstoqueValor">R$ 0,00</div>
+              <div class="kpi-sub"><span class="highlight" id="kpiEstoqueQtd">0</span> un (<span id="kpiEstoqueBaixoQtd">0</span> alertas)</div>
+            </div>
+          </section>
+
+          <div class="dashboard-grid">
+            <!-- Últimas Vendas -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title-group">
+                  <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    Últimas Vendas
+                  </h2>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="app.switchTab('tab-vendas')">Ver Todas</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Produto</th>
+                      <th>Qtd</th>
+                      <th>Total</th>
+                      <th>Lucro</th>
+                      <th>Cliente</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardRecentSalesTbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Contas Pendentes -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title-group">
+                  <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Pendentes
+                  </h2>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="app.switchTab('tab-fiado')">Ver Todos</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Valor</th>
+                      <th>Vencimento</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardRecentFiadosTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- ================= TAB: ESTOQUE ================= -->
+        <section class="tab-content-panel" id="tab-estoque">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                  Estoque, Custos & Margem
+                </h2>
+                <div class="panel-subtitle">Recálculos automáticos da planilha original</div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-sm" id="btnModalNovoProduto">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  Produto
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnExportStockExcel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="table-filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input type="text" id="inputSearchStock" placeholder="Buscar produto ou marca...">
+              </div>
+              <select class="select-filter" id="selectFilterStockBrand">
+                <option value="ALL">Todas as Marcas</option>
+              </select>
+              <select class="select-filter" id="selectFilterStockStatus">
+                <option value="ALL">Todos</option>
+                <option value="IN_STOCK">Em Estoque</option>
+                <option value="LOW_STOCK">Baixo (≤ 2)</option>
+                <option value="OUT_OF_STOCK">Esgotado</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="stockDataTable">
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Marca</th>
+                    <th>Custo</th>
+                    <th>Venda</th>
+                    <th>Estoque</th>
+                    <th>Vendidas</th>
+                    <th>Est. Custo</th>
+                    <th>Est. Venda</th>
+                    <th>Margem</th>
+                    <th>Lucro Un.</th>
+                    <th>Prev. Lucro</th>
+                    <th>Lucro Obtido</th>
+                    <th>Total Custo</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="stockTableBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4">Totais</td>
+                    <td id="footStockQtd">0</td>
+                    <td id="footStockVendidas">0</td>
+                    <td id="footStockCusto">R$ 0,00</td>
+                    <td id="footStockVenda">R$ 0,00</td>
+                    <td id="footStockMargem">-</td>
+                    <td>-</td>
+                    <td id="footStockPrevisaoLucro">R$ 0,00</td>
+                    <td id="footStockLucroObtido">R$ 0,00</td>
+                    <td id="footStockTotalCusto">R$ 0,00</td>
+                    <td>-</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: VENDAS ================= -->
+        <section class="tab-content-panel" id="tab-vendas">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                  Controle de Saídas & Vendas (2026)
+                </h2>
+                <div class="panel-subtitle">Histórico completo com faturamento e lucro</div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-sm" onclick="app.openSaleModal()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  Venda
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnExportSalesExcel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="table-filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input type="text" id="inputSearchSales" placeholder="Buscar produto, cliente ou marca...">
+              </div>
+              <select class="select-filter" id="selectFilterSalesMonth">
+                <option value="ALL">Todos os Meses</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Mês</th>
+                    <th>Produto</th>
+                    <th>Marca</th>
+                    <th>Qtd</th>
+                    <th>Custo</th>
+                    <th>Venda</th>
+                    <th>Lucro</th>
+                    <th>Cliente</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4">Total filtrado</td>
+                    <td id="footSalesQtd">0</td>
+                    <td id="footSalesCusto">R$ 0,00</td>
+                    <td id="footSalesBruto">R$ 0,00</td>
+                    <td id="footSalesLucro">R$ 0,00</td>
+                    <td colspan="2">-</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: CONTAS A RECEBER ================= -->
+        <section class="tab-content-panel" id="tab-fiado">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  Contas a Receber
+                </h2>
+                <div class="panel-subtitle">Vendas a prazo e valores pendentes</div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-sm" id="btnModalNovoFiado">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  Nova Conta
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnExportFiadoExcel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="annual-banner" style="margin-bottom: 16px;">
+              <div class="annual-banner-text">
+                <h3>Total em Aberto</h3>
+                <p>Valores negociados para pagamento posterior</p>
+              </div>
+              <div class="three-thirds-pill-group">
+                <div class="third-pill pill-cost">
+                  <span class="label">Pendente</span>
+                  <span class="val" id="fiadoBannerPendente">R$ 0,00</span>
+                </div>
+                <div class="third-pill pill-labore">
+                  <span class="label">Já Recebido</span>
+                  <span class="val" id="fiadoBannerRecebido">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input type="text" id="inputSearchFiado" placeholder="Buscar por cliente...">
+              </div>
+              <select class="select-filter" id="selectFilterFiadoStatus">
+                <option value="ALL">Todos</option>
+                <option value="pendente">Pendentes</option>
+                <option value="pago">Recebidos</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Recebimento</th>
+                    <th>Observação</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="fiadoTableBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total</td>
+                    <td id="footFiadoTotal">R$ 0,00</td>
+                    <td colspan="5">-</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: VISÃO ANUAL ================= -->
+        <section class="tab-content-panel" id="tab-anual">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                  Visão Anual & Balanço
+                </h2>
+                <div class="panel-subtitle">Desempenho mês a mês com divisão do lucro</div>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnExportAnnualExcel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Exportar
+              </button>
+            </div>
+
+            <!-- Regra 1/3 -->
+            <div class="annual-banner">
+              <div class="annual-banner-text">
+                <h3>Regra dos 3 Terços (1/3 cada)</h3>
+                <p>Lucro líquido dividido em 3 partes iguais</p>
+              </div>
+              <div class="three-thirds-pill-group">
+                <div class="third-pill pill-cost">
+                  <span class="label">Custo Fixo (33,3%)</span>
+                  <span class="val" id="bannerThirdCusto">R$ 0,00</span>
+                </div>
+                <div class="third-pill pill-labore">
+                  <span class="label">Pró-Labore (33,3%)</span>
+                  <span class="val" id="bannerThirdLabore">R$ 0,00</span>
+                </div>
+                <div class="third-pill pill-invest">
+                  <span class="label">Reinvestir (33,3%)</span>
+                  <span class="val" id="bannerThirdInvest">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráfico -->
+            <div class="chart-container-box">
+              <div class="chart-header">
+                <span>Evolução Mensal</span>
+                <div class="chart-legend">
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: var(--accent);"></span>
+                    <span>Faturamento</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: var(--success);"></span>
+                    <span>Lucro</span>
+                  </div>
+                </div>
+              </div>
+              <div class="svg-chart-bars" id="annualChartBars"></div>
+            </div>
+
+            <!-- Tabela Anual -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mês</th>
+                    <th>Qtd</th>
+                    <th>Bruto</th>
+                    <th>Custo</th>
+                    <th>Lucro</th>
+                    <th>Custo Fixo (1/3)</th>
+                    <th>Pró-Labore (1/3)</th>
+                    <th>Investir (1/3)</th>
+                  </tr>
+                </thead>
+                <tbody id="annualTableBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total 2026</td>
+                    <td id="footAnnualQtd">0</td>
+                    <td id="footAnnualBruto">R$ 0,00</td>
+                    <td id="footAnnualCusto">R$ 0,00</td>
+                    <td id="footAnnualLucro">R$ 0,00</td>
+                    <td id="footAnnualCustoFixo">R$ 0,00</td>
+                    <td id="footAnnualProLabore">R$ 0,00</td>
+                    <td id="footAnnualInvestir">R$ 0,00</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: CALCULADORA ================= -->
+        <section class="tab-content-panel" id="tab-calc">
+          <div class="calc-wrapper">
+            <div class="calc-box-card">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Precificador Comercial
+              </h3>
+              <p>Calcule preço de venda ideal, margem e divisão de lucro</p>
+
+              <div class="form-group">
+                <label>Custo do Produto (R$)</label>
+                <input type="number" step="0.01" class="form-control" id="calcInputCusto" placeholder="Ex: 620.00" value="620">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                  <label>Margem Desejada (%)</label>
+                  <input type="number" step="0.1" class="form-control" id="calcInputMargem" placeholder="Ex: 50" value="31.1">
+                </div>
+                <div class="form-group">
+                  <label>Preço de Venda (R$)</label>
+                  <input type="number" step="0.01" class="form-control" id="calcInputPrecoVenda" placeholder="Ex: 900.00" value="900">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Quantidade</label>
+                <input type="number" min="1" class="form-control" id="calcInputQtd" value="1">
+              </div>
+
+              <div class="calc-result-box">
+                <div class="calc-result-row">
+                  <span class="lbl">Preço de Venda Unitário</span>
+                  <span class="val val-cyan" id="calcResVendaUnit">R$ 0,00</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="lbl">Lucro Unitário</span>
+                  <span class="val val-positive" id="calcResLucroUnit">R$ 0,00</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="lbl">Margem Efetiva</span>
+                  <span class="val val-purple" id="calcResMargemEfetiva">0,0%</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="lbl">Markup</span>
+                  <span class="val" id="calcResMarkup">0,00x</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="lbl">Lucro Total no Lote</span>
+                  <span class="val val-positive" id="calcResLucroTotal">R$ 0,00</span>
+                </div>
+                <div class="calc-result-row" style="margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px;">
+                  <span class="lbl">Divisão por Terço (1/3)</span>
+                  <span class="val" id="calcResTerco">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="calc-box-card">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><line x1="16" x2="16" y1="10" y2="10"/><line x1="12" x2="12" y1="10" y2="10"/><line x1="8" x2="8" y1="10" y2="10"/><line x1="12" x2="12" y1="14" y2="14"/><line x1="8" x2="8" y1="14" y2="14"/><line x1="12" x2="12" y1="18" y2="18"/><line x1="8" x2="8" y1="18" y2="18"/></svg>
+                Calculadora Rápida
+              </h3>
+              <p>Operações aritméticas</p>
+
+              <div class="std-calc-display">
+                <div class="std-calc-expr" id="stdCalcExpr"></div>
+                <div class="std-calc-result" id="stdCalcResult">0</div>
+              </div>
+
+              <div class="std-calc-grid">
+                <button type="button" class="calc-btn calc-btn-action" onclick="app.calcPress('C')">C</button>
+                <button type="button" class="calc-btn calc-btn-action" onclick="app.calcPress('CE')">CE</button>
+                <button type="button" class="calc-btn calc-btn-op" onclick="app.calcPress('%')">%</button>
+                <button type="button" class="calc-btn calc-btn-op" onclick="app.calcPress('÷')">÷</button>
+
+                <button type="button" class="calc-btn" onclick="app.calcPress('7')">7</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('8')">8</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('9')">9</button>
+                <button type="button" class="calc-btn calc-btn-op" onclick="app.calcPress('×')">×</button>
+
+                <button type="button" class="calc-btn" onclick="app.calcPress('4')">4</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('5')">5</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('6')">6</button>
+                <button type="button" class="calc-btn calc-btn-op" onclick="app.calcPress('-')">−</button>
+
+                <button type="button" class="calc-btn" onclick="app.calcPress('1')">1</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('2')">2</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('3')">3</button>
+                <button type="button" class="calc-btn calc-btn-op" onclick="app.calcPress('+')">+</button>
+
+                <button type="button" class="calc-btn" onclick="app.calcPress('±')">±</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('0')">0</button>
+                <button type="button" class="calc-btn" onclick="app.calcPress('.')">.</button>
+                <button type="button" class="calc-btn calc-btn-equal" onclick="app.calcPress('=')">=</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: PEDIDOS DA FÁBRICA ================= -->
+        <section class="tab-content-panel" id="tab-pedidos">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="m9 12 2 2 4-4"/></svg>
+                  Pedidos da Fábrica
+                </h2>
+                <div class="panel-subtitle">Compras diretas da fábrica, frete rateado e custo unitário real com integração ao estoque</div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-sm" onclick="app.openFactoryOrderModal()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                  Novo Pedido
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnExportPedidosExcel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <!-- Resumo das Fórmulas / KPIs de Fábrica -->
+            <div class="annual-banner" style="margin-bottom: 16px;">
+              <div class="annual-banner-text">
+                <h3>Resumo de Compras da Fábrica</h3>
+                <p>Fórmula do Excel: Custo Unitário Final = (Qtd × Valor Fábrica + Frete) ÷ Qtd</p>
+              </div>
+              <div class="three-thirds-pill-group">
+                <div class="third-pill pill-cost">
+                  <span class="label">A Caminho (Pendentes)</span>
+                  <span class="val" id="pedidosBannerPendentes">R$ 0,00</span>
+                </div>
+                <div class="third-pill pill-labore">
+                  <span class="label">Itens a Receber</span>
+                  <span class="val" id="pedidosBannerItens">0 un</span>
+                </div>
+                <div class="third-pill pill-invest">
+                  <span class="label">Total Geral Compras</span>
+                  <span class="val" id="pedidosBannerTotal">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="table-filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input type="text" id="inputSearchPedidos" placeholder="Buscar por produto, marca, fornecedor...">
+              </div>
+              <select class="select-filter" id="selectFilterPedidosStatus">
+                <option value="ALL">Todos os Status</option>
+                <option value="pendente">Aguardando Chegada</option>
+                <option value="recebido">Recebidos / No Estoque</option>
+              </select>
+            </div>
+
+            <!-- Tabela de Pedidos -->
+            <div class="table-responsive">
+              <table class="data-table" id="pedidosDataTable">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Produto</th>
+                    <th>Marca</th>
+                    <th>Qtd</th>
+                    <th>Valor Fábrica</th>
+                    <th>Subtotal</th>
+                    <th>Frete Rateado</th>
+                    <th>Custo Un. Final</th>
+                    <th>Total Pedido</th>
+                    <th>Previsão / Rastreio</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="pedidosTableBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">Totais</td>
+                    <td id="footPedidosQtd">0</td>
+                    <td>-</td>
+                    <td id="footPedidosSubtotal">R$ 0,00</td>
+                    <td id="footPedidosFrete">R$ 0,00</td>
+                    <td id="footPedidosCustoMedio">R$ 0,00</td>
+                    <td id="footPedidosTotalGeral">R$ 0,00</td>
+                    <td colspan="3">-</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /content-area -->
+    </div><!-- /main-content -->
+  </div><!-- /app-container -->
+
+
+  <!-- ================= MODAIS ================= -->
+
+  <!-- MODAL: NOVA VENDA -->
+  <div class="modal-overlay" id="modalNovaVenda">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          Registrar Venda
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalNovaVenda')">&times;</button>
+      </div>
+      <form id="formNovaVenda">
+        <div class="form-group">
+          <label>Produto do Estoque</label>
+          <select class="form-control" id="saleInputProduct" required>
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Quantidade</label>
+            <input type="number" min="1" class="form-control" id="saleInputQtd" value="1" required>
+          </div>
+          <div class="form-group">
+            <label>Mês</label>
+            <input type="text" class="form-control" id="saleInputMes" value="SETEMBRO/26" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Custo Total (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="saleInputCusto" required>
+          </div>
+          <div class="form-group">
+            <label>Total de Venda (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="saleInputVendaTotal" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Cliente</label>
+          <input type="text" class="form-control" id="saleInputCliente" placeholder="Nome do comprador" required>
+        </div>
+
+        <div class="fiado-toggle-box">
+          <label class="fiado-toggle-label">
+            <input type="checkbox" id="saleInputIsFiado">
+            Venda a prazo (pagamento posterior)
+          </label>
+          <div id="saleFiadoDetails" style="display: none; margin-top: 8px;">
+            <label style="font-size: 0.75rem; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Data prevista para pagamento:</label>
+            <input type="date" class="form-control" id="saleInputDataVencimento">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalNovaVenda')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO PRODUTO -->
+  <div class="modal-overlay" id="modalNovoProduto">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalProdutoTitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          Cadastrar Produto
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalNovoProduto')">&times;</button>
+      </div>
+      <form id="formNovoProduto">
+        <input type="hidden" id="prodEditId">
+        <div class="form-group">
+          <label>Nome do Produto</label>
+          <input type="text" class="form-control" id="prodInputNome" placeholder="Ex: TIRZEPATIDA, BOTOX..." required>
+        </div>
+        <div class="form-group">
+          <label>Marca</label>
+          <input type="text" class="form-control" id="prodInputMarca" placeholder="Ex: TG, LIPOLESS, DYSPORT..." required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Custo (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="prodInputCusto" placeholder="620.00" required>
+          </div>
+          <div class="form-group">
+            <label>Venda (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="prodInputVenda" placeholder="900.00" required>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Estoque</label>
+            <input type="number" class="form-control" id="prodInputEstoque" value="0" required>
+          </div>
+          <div class="form-group">
+            <label>Já Vendidas</label>
+            <input type="number" class="form-control" id="prodInputVendida" value="0">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalNovoProduto')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSalvarProduto">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA CONTA A RECEBER -->
+  <div class="modal-overlay" id="modalNovoFiado">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          Nova Conta a Receber
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalNovoFiado')">&times;</button>
+      </div>
+      <form id="formNovoFiado">
+        <div class="form-group">
+          <label>Nome do Cliente</label>
+          <input type="text" class="form-control" id="fiadoInputCliente" placeholder="Ex: Titu, Rodrigo..." required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="fiadoInputValor" placeholder="1425.00" required>
+          </div>
+          <div class="form-group">
+            <label>Data de Pagamento</label>
+            <input type="date" class="form-control" id="fiadoInputData">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observação</label>
+          <input type="text" class="form-control" id="fiadoInputObs" placeholder="Ex: 2x Tirzepatida, acerto dia 10">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalNovoFiado')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: USUÁRIO -->
+  <div class="modal-overlay" id="modalUsuario">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Usuário
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalUsuario')">&times;</button>
+      </div>
+      <form id="formUsuario">
+        <div class="form-group">
+          <label>Seu Nome</label>
+          <input type="text" class="form-control" id="inputNomeUsuario" placeholder="Ex: Mano" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalUsuario')">Fechar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DADOS & BACKUP -->
+  <div class="modal-overlay" id="modalBackup">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Backup & Dados
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalBackup')">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="font-size: 0.8125rem; color: var(--text-tertiary);">
+          Dados salvos no navegador. Exporte backups para segurança:
+        </p>
+
+        <button type="button" class="btn btn-primary" id="btnExportAllExcel" style="width: 100%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Exportar Tudo para Excel (.xlsx)
+        </button>
+
+        <button type="button" class="btn btn-secondary" id="btnDownloadBackupJson" style="width: 100%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>
+          Baixar Backup JSON
+        </button>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px;">
+          <label style="font-size: 0.75rem; color: var(--text-tertiary); display: block; margin-bottom: 4px;">Restaurar backup:</label>
+          <input type="file" id="inputUploadBackupJson" accept=".json" style="font-size: 0.75rem; color: var(--text-tertiary);">
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 10px;">
+          <button type="button" class="btn btn-danger btn-sm" id="btnResetOriginalData" style="width: 100%;">
+            Restaurar Dados Originais (TABELA.xlsx)
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalBackup')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO PEDIDO DA FÁBRICA -->
+  <div class="modal-overlay" id="modalNovoPedido">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 id="modalPedidoTitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/></svg>
+          Novo Pedido da Fábrica
+        </h3>
+        <button type="button" class="btn-close-modal" onclick="app.closeModal('modalNovoPedido')">&times;</button>
+      </div>
+      <form id="formNovoPedido">
+        <input type="hidden" id="pedidoEditId">
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Produto *</label>
+            <input type="text" id="pedidoInputProduto" class="form-control" list="stockProductsDatalist" placeholder="Ex: TIRZEPATIDA" required>
+            <datalist id="stockProductsDatalist"></datalist>
+          </div>
+          <div class="form-group">
+            <label>Marca / Fábrica</label>
+            <input type="text" id="pedidoInputMarca" class="form-control" placeholder="Ex: TG, LIPOLESS, SINEDICA">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Quantidade *</label>
+            <input type="number" id="pedidoInputQtd" class="form-control" placeholder="1" min="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label>Valor Unit. (R$) *</label>
+            <input type="number" id="pedidoInputCustoUnit" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Frete / Taxas (R$)</label>
+            <input type="number" id="pedidoInputFrete" class="form-control" placeholder="0.00" step="0.01" min="0" value="0">
+          </div>
+        </div>
+
+        <!-- Cálculos automáticos ao vivo -->
+        <div class="calc-preview-card">
+          <div class="calc-preview-header">
+            <span>Cálculo Automático das Fórmulas</span>
+            <span style="font-size: 0.65rem; color: var(--accent);">TEMPO REAL</span>
+          </div>
+          <div class="calc-preview-grid">
+            <div class="calc-preview-item">
+              <span class="calc-preview-label">Subtotal Produtos</span>
+              <span class="calc-preview-val" id="pedidoCalcSubtotal">R$ 0,00</span>
+            </div>
+            <div class="calc-preview-item">
+              <span class="calc-preview-label">Total c/ Frete</span>
+              <span class="calc-preview-val highlight" id="pedidoCalcTotal">R$ 0,00</span>
+            </div>
+            <div class="calc-preview-item">
+              <span class="calc-preview-label">Frete por Unidade</span>
+              <span class="calc-preview-val" id="pedidoCalcFreteUnit">R$ 0,00</span>
+            </div>
+            <div class="calc-preview-item">
+              <span class="calc-preview-label">Custo Final Real / Un.</span>
+              <span class="calc-preview-val success" id="pedidoCalcMedio">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Data do Pedido</label>
+            <input type="date" id="pedidoInputData" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Previsão de Chegada</label>
+            <input type="date" id="pedidoInputPrevisao" class="form-control">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Código de Rastreio / Fornecedor</label>
+            <input type="text" id="pedidoInputRastreio" class="form-control" placeholder="Ex: BR109847291TG / Fábrica TG">
+          </div>
+          <div class="form-group">
+            <label>Observação</label>
+            <input type="text" id="pedidoInputObs" class="form-control" placeholder="Ex: Pago via PIX, lote 10mg">
+          </div>
+        </div>
+
+        <div class="fiado-toggle-box" id="pedidoStockToggleBox">
+          <label class="fiado-toggle-label">
+            <input type="checkbox" id="pedidoInputAddToStock">
+            Dar entrada imediata no estoque (marcar como já recebido)
+          </label>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 14px;">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modalNovoPedido')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSalvarPedido">Salvar Pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAÇÃO CUSTOMIZADA -->
+  <div class="modal-overlay" id="modalConfirm">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Confirmar</h3>
+        <button type="button" class="btn-close-modal" onclick="app.resolveConfirm(false)">&times;</button>
+      </div>
+      <div class="confirm-modal-body">
+        <p id="confirmMessage">Tem certeza?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="app.resolveConfirm(false)">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmBtnOk" onclick="app.resolveConfirm(true)">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast -->
+  <div id="toastNotification" class="toast-popup"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
