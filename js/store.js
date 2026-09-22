@@ -22,6 +22,22 @@ class AppStore {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.stock && parsed.sales) {
+          // Garante que novas vendas de INITIAL_DATA (como correções ou importações) sejam sincronizadas
+          if (window.INITIAL_DATA && window.INITIAL_DATA.sales) {
+            const existingIds = new Set(parsed.sales.map(s => s.id));
+            let addedNew = false;
+            window.INITIAL_DATA.sales.forEach(initSale => {
+              if (!existingIds.has(initSale.id)) {
+                parsed.sales.push(JSON.parse(JSON.stringify(initSale)));
+                addedNew = true;
+              }
+            });
+            if (addedNew) {
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+              } catch (errSave) {}
+            }
+          }
           // Garante que contas a receber estejam sempre completas
           if (!parsed.receivables || parsed.receivables.length === 0) {
             parsed.receivables = JSON.parse(JSON.stringify((window.INITIAL_DATA && window.INITIAL_DATA.receivables) || []));

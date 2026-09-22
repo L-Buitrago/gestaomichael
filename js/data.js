@@ -721,6 +721,17 @@ window.INITIAL_DATA = {
       "cliente": "CAROL MARTINS",
       "mes": "SETEMBRO/26",
       "data": "2026-09-08"
+    },
+    {
+      "id": "sale_50",
+      "produto": "TIRZEPATIDA AMPOLA",
+      "marca": "TG",
+      "quantidade": 1,
+      "custo": 155.0,
+      "venda_total": 300.0,
+      "cliente": "LORENA MERCEARIA",
+      "mes": "SETEMBRO/26",
+      "data": "2026-09-08"
     }
   ],
   "receivables": [

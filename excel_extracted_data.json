@@ -795,6 +795,16 @@
       "venda_total": 1000.0,
       "cliente": "CAROL MARTINS",
       "mes": "SETEMBRO/26"
+    },
+    {
+      "row": 56,
+      "produto": "TIRZEPATIDA AMPOLA",
+      "marca": "TG",
+      "quantidade": 1,
+      "custo": 155.0,
+      "venda_total": 300.0,
+      "cliente": "LORENA MERCEARIA",
+      "mes": "SETEMBRO/26"
     }
   ],
   "receivables": [
